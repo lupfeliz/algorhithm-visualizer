@@ -1,18 +1,21 @@
 <script setup>
-// import * as Tone from "tone"
 import { SortableArray, Sorter } from '@/libs/sort'
-// import $ from 'jquery'
+import { BButton, BDropdown } from 'bootstrap-vue-next'
 
-import 'bootstrap/dist/css/bootstrap.css'
+const width = 1000
+const height = 500
+const qty = 30
 
-const visual = ref({
+const inf = ref({
   vlist: [],
-  plist: [],
   plist: [],
   clist: [],
   focus: [],
   comphist: [],
   swaphist: [],
+  orgdata: '',
+  sortType: '',
+  orderType: '',
 })
 const audio = {
   ctx: undefined,
@@ -30,32 +33,38 @@ const colors = [
   '#C9CBCF'
 ]
 
+onMounted(async () => {
+  init(qty, height)
+})
+
 const init = (qty, max) => {
-  /** AudioContext 는 반드시 키보드입력이 먼저 수행되어져야 활성화 된다. */
+  max = max - 10
+  const vlist = inf.value.vlist = []
+  const clist = inf.value.clist = []
+  const plist = inf.value.plist = []
+  for (let inx = 0; inx < qty; inx++) {
+    plist.push(inx)
+    vlist.push(Math.round(Math.random() * max) + 1)
+    clist.push(colors[inx % colors.length])
+  }
+  inf.value.orgdata = JSON.stringify(inf.value.vlist)
+}
+
+const start = () => {
   if (!audio.ctx) {
     audio.ctx = new AudioContext()
     audio.vol = audio.ctx.createGain()
     audio.vol.connect(audio.ctx.destination)
     audio.vol.gain.value = 0.1
   }
-  max = max - 10
-  const clist = visual.value.clist = []
-  const ilist = visual.value.plist = []
-  const plist = visual.value.plist = []
-  const vlist = visual.value.vlist = []
-  const focus = visual.value.focus = []
-  const swaphist = visual.value.swaphist = []
-  const comphist = visual.value.comphist = []
+  const vlist = JSON.parse(inf.value.orgdata)
+  const plist = inf.value.plist = []
+  const swaphist = inf.value.swaphist = []
+  const comphist = inf.value.comphist = []
+  const sdata = JSON.parse(inf.value.orgdata)
   for (let inx = 0; inx < qty; inx++) {
-    const v = (Math.round(Math.random() * max) + 1)
-    ilist.push(inx)
     plist.push(inx)
-    vlist.push(v)
-    clist.push(colors[inx % colors.length])
   }
-  comphist.push([])
-  swaphist.push(JSON.parse(JSON.stringify(plist)))
-  const sdata = JSON.parse(JSON.stringify(vlist))
   const sortable = new SortableArray(sdata, function(type, p1, p2) {
     switch (type) {
     case 'compare': {
@@ -73,17 +82,24 @@ const init = (qty, max) => {
     } break
     default: console.log(...arguments) }
   })
+  comphist.push([])
+  swaphist.push(JSON.parse(JSON.stringify(plist)))
   console.log('BEFORE:', JSON.stringify(sdata))
-  // Sorter.heapsort(sortable)
-  Sorter.quicksort(sortable)
-  // Sorter.bubblesort(sortable)
-  // Sorter.selectionsort(sortable)
+  let ascending = true
+  if (inf.value.orderType == 'Descending') { ascending = false }
+  switch (inf.value.sortType) {
+  case 'BubbleSort': { Sorter.bubblesort(sortable, ascending) } break
+  case 'SelectionSort': { Sorter.selectionsort(sortable, ascending) } break
+  case 'HeapSort': { Sorter.heapsort(sortable, ascending) } break
+  case 'QuickSort': 
+  default: { Sorter.quicksort(sortable, ascending) } break
+  }
   console.log('AFTER:', JSON.stringify(sdata))
-  visual.value.plist = swaphist[0]
+  inf.value.plist = swaphist[0]
   const play = (hinx) => {
-    visual.value.plist = swaphist[hinx]
-    visual.value.vlist = JSON.parse(JSON.stringify(vlist))
-    const focus = visual.value.focus = comphist[hinx]
+    inf.value.plist = swaphist[hinx]
+    inf.value.vlist = JSON.parse(JSON.stringify(vlist))
+    const focus = inf.value.focus = comphist[hinx]
     for (let inx = 0; inx < focus.length; inx++) {
       // console.log(`FOCUS:${vlist[focus[inx]]}`)
       tone(vlist[focus[inx]], inx)
@@ -113,69 +129,95 @@ const tone = (freq, slot) => {
   setTimeout(() => osc.stop(), 100)
 }
 
-const width = 1000
-const height = 500
-const qty = 30
+const sortTypeUpdate = (a, b, c, d) => {
+  console.log('SORT-TYPE:', a, b, c, d)
+}
 
 </script>
 <template>
   <div class="container">
-    <h3>GRAPH</h3>
-    <div>
+    <h3>Algorithm Visualizer</h3>
+    <hr/>
+    <h4>Sort</h4>
+    <hr/>
+    <section>
       <svg :viewBox="`0 0 ${width} ${height}`" width="100%">
-        <template v-for="(v, inx) in visual.vlist">
+        <template v-for="(v, inx) in inf.vlist">
         <g
           :id="`g${inx}`"
-          :style="`transform: translate(${(visual.plist.indexOf(inx)) * Math.floor(1.0 * width / visual.vlist.length)}px, 0px)`"
+          :style="`transform: translate(${(inf.plist.indexOf(inx)) * Math.floor(1.0 * width / inf.vlist.length)}px, 0px)`"
           class="svg-animation"
           >
           <rect
             x="0"
             :y="`${height - v}`"
-            :width="`${Math.floor(1.0 * width / visual.vlist.length) - 2}`"
+            :width="`${Math.floor(1.0 * width / inf.vlist.length) - 2}`"
             :height="`${v}`"
-            :fill="`${visual.clist[inx]}`"
-            :class="`svg-animation ${visual.focus.indexOf(inx) != -1 ? 'focused' : ''}`"
+            :fill="`${inf.clist[inx]}`"
+            :class="`svg-animation ${inf.focus.indexOf(inx) != -1 ? 'focused' : ''}`"
             />
         </g>
         </template>
       </svg>
-    </div>
-    <div class="mt-1">
-      <button
-        class="btn btn-secondary mx-1"
+    </section>
+    <section class="mt-1 flex justify-center">
+      <BButton
+        class="mx-1"
+        variant="warning"
         @click="() => init(qty, height)"
         >
-        초기화
-      </button>
-      <button
-        class="btn btn-primary mx-1"
-        @click="test"
+        Initialize
+      </BButton>
+      <BDropdown
+        class="mx-1"
+        :text="`${inf.sortType || 'QuickSort'}`"
         >
-        시작
-      </button>
-      <button
-        class="btn btn-primary mx-1"
-        @click="sorttest"
+        <BDropdownItem @click="() => inf.sortType = 'BubbleSort'">BubbleSort</BDropdownItem>
+        <BDropdownItem @click="() => inf.sortType = 'SelectionSort'">SelectionSort</BDropdownItem>
+        <BDropdownItem @click="() => inf.sortType = 'HeapSort'">HeapSort</BDropdownItem>
+        <BDropdownItem @click="() => inf.sortType = 'QuickSort'">QuickSort</BDropdownItem>
+      </BDropdown>
+      <BDropdown
+        class="mx-1"
+        :text="`${inf.orderType || 'Ascending'}`"
+        >
+        <BDropdownItem @click="() => inf.orderType = 'Ascending'">Ascending</BDropdownItem>
+        <BDropdownItem @click="() => inf.orderType = 'Descending'">Descending</BDropdownItem>
+      </BDropdown>
+      <BButton
+        class="mx-1"
+        variant="primary"
+        @click="start"
+        >
+        Start!
+      </BButton>
+      <!--
+      <BButton
+        class="mx-1"
         >
         중지
-      </button>
-      <button
-        class="btn btn-primary mx-1"
+      </BButton>
+      <BButton
+        class="mx-1"
         >
         이전
-      </button>
-      <button
-        class="btn btn-primary mx-1"
+      </BButton>
+      <BButton
+        class="mx-1"
         >
         다음
-      </button>
-    </div>
+      </BButton>
+      -->
+    </section>
   </div>
 </template>
 <style scoped>
 .svg-animation {
-  transition: transform 0.5s ease-in-out;
+  transition:
+    transform 0.5s ease-in-out,
+    height 0.5s ease-in-out,
+    y 0.5s ease-in-out
+  ;
   transition-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
 }
 

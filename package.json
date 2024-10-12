@@ -12,16 +12,15 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
-    "chart.js": "^4.4.4",
+    "bootstrap-vue-next": "^0.25.0",
     "jquery": "^3.7.1",
     "lodash": "^4.17.21",
     "nuxt": "^3.13.0",
-    "tone": "^15.0.4",
     "vue": "^3.5.11",
-    "vue-chartjs": "^5.3.1",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
+    "@bootstrap-vue-next/nuxt": "^0.25.0",
     "@types/jquery": "^3.5.31",
     "@types/lodash": "^4.17.10"
   }

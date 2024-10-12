@@ -3,4 +3,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   experimental: { viewTransition: true },
   srcDir: 'src',
+  modules: ['@bootstrap-vue-next/nuxt'],
+  css: ['bootstrap/dist/css/bootstrap.min.css'],
 })
