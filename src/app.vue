@@ -1,4 +1,11 @@
 <script setup>
+/**
+ * @File        : app.vue
+ * @Author      : 정재백
+ * @Since       : 2024-10-12
+ * @Description : 정렬 알고리즘 설명용 웹앱
+ * @Site        : https://devlog.ntiple.com
+ **/
 import { SortableArray, Sorter } from '@/libs/sort'
 import { BButton, BDropdown } from 'bootstrap-vue-next'
 

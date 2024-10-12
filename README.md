@@ -1,75 +1,19 @@
-# Nuxt 3 Minimal Starter
+# Algorhithm Visualizer
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## 1. 개요
 
-## Setup
+알고리즘을 가시화 하여 설명하기 쉽도록 해준다.
 
-Make sure to install the dependencies:
+## 2. 종류
 
-```bash
-# npm
-npm install
+### 2.1. 정렬 알고리즘
 
-# pnpm
-pnpm install
+지원하는 알고리즘은 아래와 같다.
 
-# yarn
-yarn install
+- Bubble Sort
 
-# bun
-bun install
-```
+- Selection Sort
 
-## Development Server
+- Heap Sort
 
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- Quick Sort
