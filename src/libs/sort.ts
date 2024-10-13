@@ -104,7 +104,8 @@ const bubblesort: SorterType = (sortable: SortableType, ascending: boolean = tru
   let complete
   do {
     complete = true
-    for (let inx = 0; inx < len - 1; inx++) {
+    len -= 1
+    for (let inx = 0; inx < len; inx++) {
       let comp = sortable.compare(inx, inx + 1)
       if ((ascending && comp > 0) || (!ascending && comp < 0)) {
         sortable.swap(inx, inx + 1)

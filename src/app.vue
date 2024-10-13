@@ -20,9 +20,13 @@ const inf = ref({
   focus: [],
   comphist: [],
   swaphist: [],
+  cstate: {},
   orgdata: '',
   sortType: '',
   orderType: '',
+  statistics: [],
+  handle: undefined,
+  hinx: 0,
 })
 const audio = {
   ctx: undefined,
@@ -68,16 +72,19 @@ const start = () => {
   const plist = inf.value.plist = []
   const swaphist = inf.value.swaphist = []
   const comphist = inf.value.comphist = []
+  const stathist = inf.value.statistics = []
   const sdata = JSON.parse(inf.value.orgdata)
   for (let inx = 0; inx < qty; inx++) {
     plist.push(inx)
   }
   const sortable = new SortableArray(sdata, function(type, p1, p2) {
+    const lstat = stathist[(stathist.length || 1) - 1] || { comp: 0, swap: 0 }
     switch (type) {
     case 'compare': {
       // console.log(`COMPARE:[${p1}]=${sdata[p1]} : [${p2}]=${sdata[p2]}`)
       comphist.push([plist[p1], plist[p2]])
       swaphist.push(JSON.parse(JSON.stringify(plist)))
+      stathist.push({ comp: lstat.comp + 1, swap: lstat.swap })
     } break
     case 'swap': {
       // console.log(`SWAP:[${p1}]=${sdata[p1]} : [${p2}]=${sdata[p2]} -> [${p1}]=${sdata[p2]} : [${p2}]=${sdata[p1]} `)
@@ -86,11 +93,13 @@ const start = () => {
       plist[p2] = v
       comphist.push([plist[p1], plist[p2]])
       swaphist.push(JSON.parse(JSON.stringify(plist)))
+      stathist.push({ comp: lstat.comp, swap: lstat.swap + 1 })
     } break
     default: console.log(...arguments) }
   })
   comphist.push([])
   swaphist.push(JSON.parse(JSON.stringify(plist)))
+  stathist.push({ comp: 0, swap: 0 })
   console.log('BEFORE:', JSON.stringify(sdata))
   let ascending = true
   if (inf.value.orderType == 'Descending') { ascending = false }
@@ -103,19 +112,31 @@ const start = () => {
   }
   console.log('AFTER:', JSON.stringify(sdata))
   inf.value.plist = swaphist[0]
-  const play = (hinx) => {
+  play = (hinx) => {
+    if (inf.value.handle) { clearTimeout(inf.value.handle) }
+    inf.value.hinx = hinx
     inf.value.plist = swaphist[hinx]
     inf.value.vlist = JSON.parse(JSON.stringify(vlist))
+    inf.value.cstate = inf.value.statistics[hinx]
     const focus = inf.value.focus = comphist[hinx]
     for (let inx = 0; inx < focus.length; inx++) {
       // console.log(`FOCUS:${vlist[focus[inx]]}`)
       tone(vlist[focus[inx]], inx)
     }
     if (hinx + 1 < swaphist.length) {
-      setTimeout(() => play(hinx + 1), 100)
+      inf.value.handle = setTimeout(() => play(hinx + 1), 100)
     }
   }
-  setTimeout(() => play(0), 1000)
+  inf.value.handle = setTimeout(() => play(0), 500)
+}
+let play = (hinx) => { }
+const stop = () => {
+  if (inf.value.handle) {
+    clearTimeout(inf.value.handle)
+    inf.value.handle = undefined
+  } else {
+    play(inf.value.hinx)
+  }
 }
 
 const tone = (freq, slot) => {
@@ -136,9 +157,6 @@ const tone = (freq, slot) => {
   setTimeout(() => osc.stop(), 100)
 }
 
-const sortTypeUpdate = (a, b, c, d) => {
-  console.log('SORT-TYPE:', a, b, c, d)
-}
 
 </script>
 <template>
@@ -198,12 +216,21 @@ const sortTypeUpdate = (a, b, c, d) => {
         >
         Start!
       </BButton>
+      <template v-if="inf.hinx > 0 && inf.hinx < inf.swaphist.length - 1">
+        <BButton
+          class="mx-1"
+          variant="danger"
+          @click="stop"
+          >
+          <template v-if="inf.handle">
+          Stop!
+          </template>
+          <template v-else>
+          Resume!
+          </template>
+        </BButton>
+      </template>
       <!--
-      <BButton
-        class="mx-1"
-        >
-        중지
-      </BButton>
       <BButton
         class="mx-1"
         >
@@ -215,6 +242,17 @@ const sortTypeUpdate = (a, b, c, d) => {
         다음
       </BButton>
       -->
+    </section>
+    <section>
+      <div>
+        Data length : <span v-html="`${inf.vlist.length || 0}`"></span>
+      </div>
+      <div>
+        Compare : <span v-html="`${inf.cstate.comp || 0}`"></span>
+      </div>
+      <div>
+        Swap : <span v-html="`${inf.cstate.swap || 0}`"></span>
+      </div>
     </section>
   </div>
 </template>
