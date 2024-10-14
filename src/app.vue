@@ -106,6 +106,7 @@ const start = () => {
   switch (inf.value.sortType) {
   case 'BubbleSort': { Sorter.bubblesort(sortable, ascending) } break
   case 'SelectionSort': { Sorter.selectionsort(sortable, ascending) } break
+  case 'SelectionSort2': { Sorter.selectionsort2(sortable, ascending) } break
   case 'HeapSort': { Sorter.heapsort(sortable, ascending) } break
   case 'QuickSort': 
   default: { Sorter.quicksort(sortable, ascending) } break
@@ -199,6 +200,7 @@ const tone = (freq, slot) => {
         >
         <BDropdownItem @click="() => inf.sortType = 'BubbleSort'">BubbleSort</BDropdownItem>
         <BDropdownItem @click="() => inf.sortType = 'SelectionSort'">SelectionSort</BDropdownItem>
+        <BDropdownItem @click="() => inf.sortType = 'SelectionSort2'">SelectionSort2</BDropdownItem>
         <BDropdownItem @click="() => inf.sortType = 'HeapSort'">HeapSort</BDropdownItem>
         <BDropdownItem @click="() => inf.sortType = 'QuickSort'">QuickSort</BDropdownItem>
       </BDropdown>

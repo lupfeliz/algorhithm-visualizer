@@ -120,13 +120,46 @@ const bubblesort: SorterType = (sortable: SortableType, ascending: boolean = tru
 const selectionsort: SorterType = (sortable: SortableType, ascending: boolean = true) => {
   if (sortable.intercept) { sortable.intercept('start') }
   let len = sortable.length()
-  let loops = len - 1
-  for (let inx1 = 0; inx1 < loops; inx1++) {
+  let end = len - 1
+  for (let inx1 = 0; inx1 < end; inx1++) {
     for (let inx2 = inx1 + 1; inx2 < len; inx2++) {
       let comp = sortable.compare(inx1, inx2)
       if ((ascending && comp > 0) || (!ascending && comp < 0)) {
         sortable.swap(inx1, inx2)
       }
+    }
+  }
+  if (sortable.intercept) { sortable.intercept('complete') }
+}
+
+/** 두방향 선택정렬 */
+const selectionsort2: SorterType = (sortable: SortableType, ascending: boolean = true) => {
+  if (sortable.intercept) { sortable.intercept('start') }
+  let len = sortable.length()
+  let end = len - 1
+  let inx1 = 0
+  let inx2 = 0
+  let flag = 0
+  for (inx1 = 0; inx1 < end; flag++) {
+    if (flag % 2 == 0) {
+      /** 정방향 */
+      for (inx2 = inx1 + 1; inx2 < len; inx2++) {
+        let comp = sortable.compare(inx1, inx2)
+        if ((ascending && comp > 0) || (!ascending && comp < 0)) {
+          sortable.swap(inx1, inx2)
+        }
+      }
+      inx1 += 1
+    } else {
+      /** 역방향 */
+      for (inx2 = inx1; inx2 < end; inx2++) {
+        let comp = sortable.compare(inx2, end)
+        if ((ascending && comp > 0) || (!ascending && comp < 0)) {
+          sortable.swap(inx2, end)
+        }
+      }
+      len -= 1
+      end -= 1
     }
   }
   if (sortable.intercept) { sortable.intercept('complete') }
@@ -249,6 +282,7 @@ const heapsort: SorterType = (sortable: SortableType, ascending: boolean = true)
 const Sorter = {
   bubblesort,
   selectionsort,
+  selectionsort2,
   quicksort,
   heapsort
 }
