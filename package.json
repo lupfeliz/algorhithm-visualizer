@@ -35,6 +35,9 @@
   "devDependencies": {
     "@bootstrap-vue-next/nuxt": "^0.25.0",
     "@types/jquery": "^3.5.31",
-    "@types/lodash": "^4.17.10"
+    "@types/lodash": "^4.17.10",
+    "@vitejs/plugin-legacy": "^5.4.2",
+    "core-js": "^3.38.1",
+    "resize-observer-polyfill": "^1.5.1"
   }
 }

@@ -8,11 +8,24 @@
  * https://nuxt.com/docs/api/configuration/nuxt-config
  **/
 
-// import legacy from '@vitejs/plugin-legacy'
+import legacy from '@vitejs/plugin-legacy'
 import path, { dirname } from 'path'
+import { type Plugin, type TransformResult } from 'vite';
 
 const dir = dirname(__filename)
 const distdir = path.join(dir, 'dist')
+
+const sourceModifier = () => ({
+  name: 'source-modifier-plugin',
+  enforce: 'pre',
+  async transform(src: string, fname: string) {
+    const ret: TransformResult = undefined as any
+    // console.log('FILENAME:', fname)
+    return ret
+  },
+} as any as Plugin[])
+
+
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
@@ -26,19 +39,27 @@ export default defineNuxtConfig({
     // analyze: false,
   },
   vite: {
-    optimizeDeps: {
-      esbuildOptions: {
-        target: 'es2015'
-      }
-    },
     plugins: [
+      legacy({
+        targets: ['defaults', 'not IE 11', 'chrome > 59', 'firefox > 60'],
+        externalSystemJS: false,
+      }),
+      sourceModifier()
     ],
+    build: {
+      minify: true,
+      rollupOptions: {
+        output: {
+        },
+      },
+    },
   },
   nitro: {
     output: { publicDir: distdir }
   },
   app: {
     head: {
+      script: [ { src: '/system.min.js' } ]
     },
     baseURL: ``,
   },
