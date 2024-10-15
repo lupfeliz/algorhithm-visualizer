@@ -10,22 +10,25 @@
 
 import legacy from '@vitejs/plugin-legacy'
 import path, { dirname } from 'path'
+import { existsSync } from 'fs'
 import { type Plugin, type TransformResult } from 'vite';
 
+const log = { debug: console.log }
 const dir = dirname(__filename)
 const distdir = path.join(dir, 'dist')
+const baseURL = ''
+const env: any = process.env
+env.BASE_DIR = dir
+env.BASE_URL = baseURL
 
 const sourceModifier = () => ({
   name: 'source-modifier-plugin',
   enforce: 'pre',
   async transform(src: string, fname: string) {
     const ret: TransformResult = undefined as any
-    // console.log('FILENAME:', fname)
     return ret
   },
 } as any as Plugin[])
-
-
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
@@ -64,8 +67,8 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      script: [ { src: '/system.min.js' } ]
+      // script: [ { src: `${baseURL}/system.min.js` } ]
     },
-    baseURL: ``,
+    baseURL,
   },
 })

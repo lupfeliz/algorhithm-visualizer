@@ -162,12 +162,12 @@ const tone = (freq, slot) => {
 </script>
 <template>
   <div class="container">
-    <h3>Algorithm Visualizer</h3>
+    <h3 class="mt-3">Algorithm Visualizer</h3>
     <hr/>
     <h4>Sort</h4>
     <hr/>
     <section>
-      <svg :viewBox="`0 0 ${width} ${height}`" width="100%">
+      <svg :viewBox="`0 0 ${width} ${height}`" width="100%" style="max-height: 20rem">
         <template v-for="(v, inx) in inf.vlist">
         <g
           :id="`g${inx}`"
@@ -186,7 +186,7 @@ const tone = (freq, slot) => {
         </template>
       </svg>
     </section>
-    <section class="mt-1 flex justify-center">
+    <section class="mt-1 flex justify-center flex-wrap">
       <BButton
         class="mx-1"
         variant="warning"
@@ -272,6 +272,10 @@ const tone = (freq, slot) => {
   margin-top: 0.25rem;
 }
 
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
 .mx-1 {
   margin-left: 0.25rem;
   margin-right: 0.25rem;
@@ -311,6 +315,12 @@ const tone = (freq, slot) => {
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
+}
+
+.flex-wrap {
+  -ms-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .justify-center {
