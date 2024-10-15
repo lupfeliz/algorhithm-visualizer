@@ -67,7 +67,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      // script: [ { src: `${baseURL}/system.min.js` } ]
+      script: [ { src: `${baseURL}/system.min.js` } ]
     },
     baseURL,
   },
