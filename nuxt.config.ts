@@ -50,6 +50,11 @@ export default defineNuxtConfig({
       minify: true,
       rollupOptions: {
         output: {
+          /** legacy 플러그인 사용시 파일명 고정이 안됨 */
+          /** entry 스크립트인지 구분하기 위해 파일명 수정 */
+          // entryFileNames: 'entry/[hash].js',
+          // chunkFileNames: "chunk/[hash].js",
+          // assetFileNames: '[ext]/[hash].[ext]'
         },
       },
     },

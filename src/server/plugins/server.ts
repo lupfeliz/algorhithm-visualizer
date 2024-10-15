@@ -6,26 +6,25 @@
  * @Site        : https://devlog.ntiple.com
  **/
 export default defineNitroPlugin((nitroApp) => {
-  nitroApp.hooks.hook('render:html', (html, { event }) => {
+  nitroApp.hooks.hook('render:html', (html, e) => {
     // html.head.push( `<script></script>`,)
-    // console.log('CHECK:', html)
   })
   /** FIXME: 현재 극히일부 상황에 대한 처리만 하였으므로 더 테스트가 필요함 */
-  nitroApp.hooks.hook('render:response', (response, { event }) => {
-    // console.log('render:response', event?.context?.params?._, response.body)
-    if (/(^$|^[a-zA-Z0-9_-]+$|\/[a-zA-Z0-9_-]+$|\.html$)/.test(String(event?.context?.params?._))) {
-      // console.log('render:response', event?.context?.params?._)
+  nitroApp.hooks.hook('render:response', (resp, e) => {
+    if (/(^$|^[a-zA-Z0-9_-]+$|\/[a-zA-Z0-9_-]+$|\.html$)/.test(String(e?.event?.context?.params?._))) {
       let st = 0, ed = 0
-      let html = String(response.body)
+      let html = String(resp.body)
       const nd1 = '<script type="module" src="/_nuxt/'
       const nd2 = '" crossorigin></script>'
       let nth = 0
       let fname = '', tag = ''
-      for (let inx = 0; inx < 999; inx++) {
+      LOOP1: for (let inx = 0; inx < 999; inx++) {
         st = html.indexOf(nd1, ed)
         ed = html.indexOf(nd2, st + nd1.length)
+        /** entrypoint 스크립트인 경우 처리 */
         if (st != -1 && ed != -1 && (ed - st - nd1.length) < 30) {
           fname = html.substring(st + nd1.length, ed)
+          if (fname == '@vite/client') { break LOOP1 }
           if (nth === 0) {
             tag = `<script type="systemjs-module" src="/_nuxt/${fname}" crossorigin></script>`
             html = `${html.substring(0, st)}${tag}${html.substring(ed + nd2.length)}`
@@ -40,7 +39,7 @@ export default defineNitroPlugin((nitroApp) => {
           break
         }
       }
-      response.body = html
+      if (nth > 0) { resp.body = html }
     }
   })
 })
