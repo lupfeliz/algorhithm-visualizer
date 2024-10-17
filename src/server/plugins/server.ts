@@ -10,8 +10,11 @@ import { existsSync, cpSync } from 'fs'
 
 const log = { debug: console.log }
 const env: any = process.env
+const baseURL = env.BASE_URL
 // const dir = dirname(dirname(dirname(__filename)))
 // const distdir = path.join(dir, 'dist')
+const nd1 = `<script type="module" src="${baseURL}/_nuxt/`
+const nd2 = '" crossorigin></script>'
 
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('render:html', (html, e) => {
@@ -31,10 +34,9 @@ export default defineNitroPlugin((nitroApp) => {
     if (/(^$|^[a-zA-Z0-9_-]+$|\/[a-zA-Z0-9_-]+$|\.html$)/.test(String(e?.event?.context?.params?._))) {
       let st = 0, ed = 0
       let html = String(resp.body)
-      const nd1 = '<script type="module" src="/_nuxt/'
-      const nd2 = '" crossorigin></script>'
       let nth = 0
       let fname = '', tag = ''
+      // console.log('MODIFY-PATH:', e?.event?.context?.params?._)
       LOOP1: for (let inx = 0; inx < 999; inx++) {
         st = html.indexOf(nd1, ed)
         ed = html.indexOf(nd2, st + nd1.length)
@@ -43,7 +45,7 @@ export default defineNitroPlugin((nitroApp) => {
           fname = html.substring(st + nd1.length, ed)
           if (fname == '@vite/client') { break LOOP1 }
           if (nth === 0) {
-            tag = `<script type="systemjs-module" src="/_nuxt/${fname}" crossorigin></script>`
+            tag = `<script type="systemjs-module" src="${baseURL}/_nuxt/${fname}" crossorigin></script>`
             html = `${html.substring(0, st)}${tag}${html.substring(ed + nd2.length)}`
             ed = st + tag.length
           } else if (!fname.endsWith('-legacy.js')) {
